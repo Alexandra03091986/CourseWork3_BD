@@ -19,7 +19,7 @@ class HHParser:
         return response
 
     def get_all_vacancies_by_employers(self):
-        """Получаем всех вакансий"""
+        """Получаем все вакансии"""
         employers = self.get_employers()
         all_vacancies = []
         for employer in employers:
@@ -40,5 +40,6 @@ class HHParser:
 
 
 # hh = HHParser()
+# print(hh.get_employers())
 # # print(hh.get_vacancies_by_employer(1942330))
 # print(hh.get_all_vacancies_by_employers())
