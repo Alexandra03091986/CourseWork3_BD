@@ -6,7 +6,6 @@ class HHParser:
         self.__url_employer = "https://api.hh.ru/employers"
         self.__url_vacancies = "https://api.hh.ru/vacancies"
 
-
     def get_employers(self):
         params = {"sort_by": "by_vacancies_open", "per_page":10}
         response = requests.get(self.__url_employer, params=params)
@@ -19,15 +18,14 @@ class HHParser:
         response = requests.get(self.__url_vacancies, params=params).json()["items"]
         return response
 
-
     def get_all_vacancies_by_employers(self):
+        """Получаем всех вакансий"""
         employers = self.get_employers()
         all_vacancies = []
         for employer in employers:
             vacancies = self.get_vacancies_by_employer(employer["id"])
             all_vacancies.extend([self.filter_vacancy(vacancy) for vacancy in vacancies])
         return all_vacancies
-
 
     @staticmethod
     def filter_vacancy(vacancy):
@@ -41,6 +39,6 @@ class HHParser:
                 "url": vacancy["alternate_url"], "salary_from": salary_from, "salary_to": salary_to}
 
 
-hh = HHParser()
-# print(hh.get_vacancies_by_employer(1942330))
-print(hh.get_all_vacancies_by_employers())
+# hh = HHParser()
+# # print(hh.get_vacancies_by_employer(1942330))
+# print(hh.get_all_vacancies_by_employers())
