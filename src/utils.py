@@ -43,7 +43,7 @@ def create_table(name_db):
                             CREATE TABLE vacancies (
                             id INTEGER PRIMARY KEY,
                             employer_id INTEGER REFERENCES employers(id),
-                            name VARCHAR(255) NOT NULL,
+                            name_vacancy VARCHAR(255) NOT NULL,
                             salary_from INTEGER,
                             salary_to INTEGER,
                             url_vacancy VARCHAR(255)
@@ -73,12 +73,12 @@ def insert_tables(name_db):
                         "INSERT INTO vacancies ("
                         "id,"
                         " employer_id,"
-                        " name,"
+                        " name_vacancy,"
                         " salary_from, "
                         "salary_to,"
                         " url_vacancy"
                         ") VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT (id) DO NOTHING",
-                        (filter_vacancy["id"], employer["id"], filter_vacancy["name"],
+                        (filter_vacancy["id"], employer["id"], filter_vacancy["name_vacancy"],
                          filter_vacancy["salary_from"],
                          filter_vacancy["salary_to"],
                          filter_vacancy["url"])
