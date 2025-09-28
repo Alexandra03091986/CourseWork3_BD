@@ -9,4 +9,7 @@ insert_tables(name_db)
 
 db_manager = DBManager(name_db)
 # # print(db_manager.get_all_employers())
-print(db_manager.get_companies_and_vacancies_count())
+# print(db_manager.get_companies_and_vacancies_count())
+# print(db_manager.get_all_vacancies())
+# print(db_manager.get_avg_salary())
+print(db_manager.get_vacancies_with_higher_salary())
