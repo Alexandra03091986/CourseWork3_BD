@@ -21,6 +21,7 @@ class DBManager:
         conn.close()
         return  res
 
+
     def get_all_employers(self):
         return self.execute_query("SELECT * FROM employers")
 
