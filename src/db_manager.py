@@ -85,3 +85,15 @@ class DBManager:
             ORDER BY salary DESC
             """
         )
+
+    def get_vacancies_with_keyword(self, word):
+        """Получает список всех вакансий, в названии которых содержатся переданные в метод слова,
+         например python."""
+        save_word = word.replace("'", "''")
+        return self.execute_query(
+            f"""
+            SELECT name_vacancy, salary_from, salary_to, url_vacancy FROM vacancies 
+            WHERE lower(name_vacancy) LIKE lower('%{save_word}%')
+            """
+
+        )
