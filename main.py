@@ -1,7 +1,3 @@
-from multiprocessing.spawn import get_command_line
-
-from click.shell_completion import get_completion_class
-
 from src.utils import create_database, create_table, insert_tables
 from src.db_manager import DBManager
 
@@ -26,6 +22,7 @@ while True:
     print("6. Выход")
     answer = input()
     print("Подождите идет обработка запроса...")
+
     if answer == "1":
         for elem in db_manager.get_companies_and_vacancies_count():
             print(f"Название компании: {elem[0]}\n "
@@ -46,11 +43,7 @@ while True:
                   f"Средняя зарплата {elem[1]} руб.\n")
     elif answer == "5":
         query_word = input("Введите название вакансии: ")
-        # vacancies = db_manager.get_vacancies_with_keyword(query_word)
 
-        # if not vacancies:
-        #     print("Такой вакансии нет. Попробуй еще раз")
-        # else:
         for elem in db_manager.get_vacancies_with_keyword(query_word):
 
             print(f"Название вакансии: {elem[0]}\n"
@@ -59,12 +52,3 @@ while True:
         print(f"Найдено вакансий - {len(db_manager.get_vacancies_with_keyword(query_word))}")
     elif answer == "6":
          break
-
-
-
-# # print(db_manager.get_all_employers())
-# print(db_manager.get_companies_and_vacancies_count())
-# print(db_manager.get_all_vacancies())
-# print(db_manager.get_avg_salary())
-# print(db_manager.get_vacancies_with_higher_salary())
-# print(db_manager.get_vacancies_with_keyword('Кладовщик'))
