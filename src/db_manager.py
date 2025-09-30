@@ -1,50 +1,52 @@
+from typing import Any, Dict, List, Tuple
+
 import psycopg2
 
 from src.config import config
 
 
 class DBManager:
-    """Класс для управления подключением к базе данных и выполнением SQ-запросов.
-    """
-    def __init__(self, db_name):
+    """Класс для управления подключением к базе данных и выполнением SQ-запросов."""
+
+    def __init__(self, db_name: str) -> None:
         """Инициализирует менеджер базы данных с указанным именем БД"""
         self.__db_name = db_name
 
-    def execute_query(self, query):
+    def execute_query(self, query: str) -> List[Tuple[Any, ...]]:
         """Выполняет SQ-запрос к базе данных и возвращает результаты."""
-        params = config()
+        params: Dict[str, Any] = config()
         conn = psycopg2.connect(dbname=self.__db_name, **params)
         with conn:
             with conn.cursor() as cur:
                 cur.execute(query)
                 res = cur.fetchall()
         conn.close()
-        return  res
+        return res
 
-
-    def get_all_employers(self):
-        return self.execute_query("SELECT * FROM employers")
-
-    def get_companies_and_vacancies_count(self):
-        """ Получает список всех компаний и количество вакансий у каждой компании."""
-        return self.execute_query("""
-            SELECT DISTINCT name, COUNT(*) FROM employers 
-            INNER JOIN vacancies ON employers.id = vacancies.employer_id 
-            GROUP BY name
-        """)
-
-    def get_all_vacancies(self):
-        """Получает список всех вакансий с указанием названия компании,
-         названия вакансии и зарплаты и ссылки на вакансию."""
+    def get_companies_and_vacancies_count(self) -> List[Tuple[Any, ...]]:
+        """Получает список всех компаний и количество вакансий у каждой компании."""
         return self.execute_query(
             """
-            SELECT name as company_name, name_vacancy, salary_from, salary_to, url_vacancy FROM employers 
+            SELECT DISTINCT name, COUNT(*) 
+            FROM employers 
+            INNER JOIN vacancies ON employers.id = vacancies.employer_id 
+            GROUP BY name
+        """
+        )
+
+    def get_all_vacancies(self) -> List[Tuple[Any, ...]]:
+        """Получает список всех вакансий с указанием названия компании,
+        названия вакансии и зарплаты и ссылки на вакансию."""
+        return self.execute_query(
+            """
+            SELECT name as company_name, name_vacancy, salary_from, salary_to, url_vacancy 
+            FROM employers 
             INNER JOIN vacancies ON employers.id = vacancies.employer_id 
             ORDER BY company_name, name_vacancy
             """
         )
 
-    def get_avg_salary(self):
+    def get_avg_salary(self) -> List[Tuple[Any, ...]]:
         """Получает среднюю зарплату по вакансиям."""
         return self.execute_query(
             """
@@ -64,7 +66,7 @@ class DBManager:
             """
         )
 
-    def get_vacancies_with_higher_salary(self):
+    def get_vacancies_with_higher_salary(self) -> List[Tuple[Any, ...]]:
         """Получает список всех вакансий, у которых зарплата выше средней по всем вакансиям."""
         return self.execute_query(
             """
@@ -87,14 +89,14 @@ class DBManager:
             """
         )
 
-    def get_vacancies_with_keyword(self, word):
+    def get_vacancies_with_keyword(self, word: str) -> List[Tuple[Any, ...]]:
         """Получает список всех вакансий, в названии которых содержатся переданные в метод слова,
-         например python."""
-        save_word = word.replace("'", "''")
+        например python."""
+        safe_word = word.replace("'", "''")
         return self.execute_query(
             f"""
-            SELECT name_vacancy, salary_from, salary_to, url_vacancy FROM vacancies 
-            WHERE lower(name_vacancy) LIKE lower('%{save_word}%')
+            SELECT name_vacancy, salary_from, salary_to, url_vacancy 
+            FROM vacancies 
+            WHERE lower(name_vacancy) LIKE lower('%{safe_word}%')
             """
-
         )

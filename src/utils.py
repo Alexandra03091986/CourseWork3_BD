@@ -1,14 +1,17 @@
+from typing import Any, Dict
+
 import psycopg2
+
 from src.config import config
 from src.hh_api import HHParser
 
 
-def create_database(name_db):
-    """ Создание новой базы данных PostgreSQL.
+def create_database(name_db: str) -> None:
+    """Создание новой базы данных PostgreSQL.
     Функция подключается к серверу PostgreSQL,
     удаляет базу данных если она существует и
     создает новую пустую базу данных с указанным именем."""
-    params = config()
+    params: Dict[str, Any] = config()
     conn = psycopg2.connect(dbname="postgres", **params)
     conn.autocommit = True
     cur = conn.cursor()
@@ -20,16 +23,16 @@ def create_database(name_db):
     conn.close()
 
 
-def create_table(name_db):
+def create_table(name_db: str) -> None:
     """Создание таблиц в указанной БД для хранения данных.
-     Функция создает две связанные таблицы:
-     employers - таблица работодателей
-     vacancies - таблица вакансий с внешним ключом employers
-     """
-    params = config()
+    Функция создает две связанные таблицы:
+    employers - таблица работодателей
+    vacancies - таблица вакансий с внешним ключом employers
+    """
+    params: Dict[str, Any] = config()
     conn = psycopg2.connect(dbname=name_db, **params)
     with conn:
-        with conn.cursor()as cur:
+        with conn.cursor() as cur:
             cur.execute(
                 """
                 CREATE TABLE employers (
@@ -39,7 +42,8 @@ def create_table(name_db):
                 """
             )
 
-            cur.execute("""
+            cur.execute(
+                """
                             CREATE TABLE vacancies (
                             id INTEGER PRIMARY KEY,
                             employer_id INTEGER REFERENCES employers(id),
@@ -48,22 +52,23 @@ def create_table(name_db):
                             salary_to INTEGER,
                             url_vacancy VARCHAR(255)
                             )
-                        """)
+                        """
+            )
     conn.close()
 
 
-def insert_tables(name_db):
+def insert_tables(name_db: str) -> None:
     """Заполняет таблицы БД данными о работодателях и их вакансиях из API HH."""
     hh_parser = HHParser()
     employers = hh_parser.get_employers()
-    params = config()
+    params: Dict[str, Any] = config()
     conn = psycopg2.connect(dbname=name_db, **params)
     with conn:
         with conn.cursor() as cur:
             for employer in employers:
                 cur.execute(
                     "INSERT INTO employers VALUES (%s, %s)",
-                    (employer["id"], employer["name"])
+                    (employer["id"], employer["name"]),
                 )
 
                 vacancies = hh_parser.get_vacancies_by_employer(employer["id"])
@@ -78,10 +83,14 @@ def insert_tables(name_db):
                         "salary_to,"
                         " url_vacancy"
                         ") VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT (id) DO NOTHING",
-                        (filter_vacancy["id"], employer["id"], filter_vacancy["name_vacancy"],
-                         filter_vacancy["salary_from"],
-                         filter_vacancy["salary_to"],
-                         filter_vacancy["url"])
+                        (
+                            filter_vacancy["id"],
+                            employer["id"],
+                            filter_vacancy["name_vacancy"],
+                            filter_vacancy["salary_from"],
+                            filter_vacancy["salary_to"],
+                            filter_vacancy["url"],
+                        ),
                     )
 
     conn.close()
